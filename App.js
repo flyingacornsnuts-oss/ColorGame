@@ -3,25 +3,26 @@ import { useState } from 'react';
 
 export default function App() {
   const [size, setSize] = useState(1);
-  const [rand, setRand] = useState(0);
   const [numCol, setNumCol] = useState(1);
   const [boxList, setBoxList] = useState([false]);
   const [color, setColor] = useState('rgb( 250, 0, 0)');
   const [points, setPoints] = useState(0);
+  const [alpha, setAlpha] = useState(0.5);
 
-  const press = (value) => {
-    const newPoints = value? points+1 : 0;
+  const press = (value) => { 
+    const newAlpha = value ? Math.min(.9, alpha + 0.05) : 0.5;
+    setAlpha(newAlpha);
+    const newPoints = value ? points + 1 : 0;
     setPoints(newPoints);
-    colorChange()
-    const newSize = value ? Math.min(size + 1, 5) : 2;
+    colorChange();
+    const newSize = value ? Math.min(size + 1, 10) : 2;
     setSize(newSize);
     setNumCol(newSize);
-    const randSet = Math.trunc(Math.random() * Math.pow(newSize, 2));
-    setRand(randSet);
+    const rand = Math.trunc(Math.random() * Math.pow(newSize, 2));
     setBoxList(
       Array.from(
         { length: Math.pow(newSize, 2) },
-        (_, index) => index === randSet
+        (_, index) => index === rand
       )
     );
   };
@@ -35,9 +36,6 @@ export default function App() {
   }
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>
-        Size: {size} Random: {rand} Color: {color}) Points: {points}
-      </Text>
       <FlatList
         data={boxList}
         contentContainerStyle={{}}
@@ -48,13 +46,18 @@ export default function App() {
             <Pressable style={[
               styles.box,
               boxData.item
-                ? { backgroundColor: color + ', .7 )' }
+                ? { backgroundColor: color + ',' + alpha +   ')' }
                 : { backgroundColor: color + ')' },
             ]} onPress={() => press(boxData.item)}>
             </Pressable>
           );
         }}
       />
+      <View style={styles.contxt}>
+      <Text style={styles.text}>
+        {points}
+      </Text>
+      </View>
     </View>
   );
 }
@@ -66,12 +69,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'stretch',
     backgroundColor: 'white',
-    padding: 8,
+    padding: 10,
+  },
+  contxt: {
+    flex: 1,
+    alignItems: 'center',
   },
   text: {
     color: 'black',
     fontSize: 20,
-    marginBottom: 10,
+    marginTop: -50,
+    fontSize: 100,
   },
   list: {
     borderWidth: 5,
